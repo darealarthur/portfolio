@@ -70,6 +70,13 @@
     return DATA.ui[state.lang] || DATA.ui.pt;
   }
 
+  function formatExternalUrl(rawUrl) {
+    const u = String(rawUrl || "").trim();
+    if (!u || u === "#") return "#";
+    if (/^(https?:\/\/|mailto:|tel:|#)/i.test(u)) return u;
+    return `https://${u.replace(/^\/+/, "")}`;
+  }
+
   // ==========================================================================
   // 1. INICIALIZAÇÃO DO PALCO 1920x1080 E ESCALA RESPONSIVA UNIFORME
   // ==========================================================================
@@ -378,12 +385,20 @@
           </div>
 
           <div class="detail-actions">
-            <a href="${activeProj.demoUrl}" target="_blank" rel="noopener" class="p5-action-btn">
-              <span>${ui.liveBtn}</span>
-            </a>
-            <a href="${activeProj.repoUrl}" target="_blank" rel="noopener" class="p5-action-btn secondary">
-              <span>${ui.codeBtn}</span>
-            </a>
+            ${
+              activeProj.demoUrl
+                ? `<a href="${formatExternalUrl(activeProj.demoUrl)}" target="_blank" rel="noopener" class="p5-action-btn">
+                    <span>${ui.liveBtn}</span>
+                  </a>`
+                : ""
+            }
+            ${
+              activeProj.repoUrl
+                ? `<a href="${formatExternalUrl(activeProj.repoUrl)}" target="_blank" rel="noopener" class="p5-action-btn secondary">
+                    <span>${ui.codeBtn}</span>
+                  </a>`
+                : ""
+            }
           </div>
         </div>
       </div>
@@ -691,8 +706,9 @@
             const title = isEn() ? b.titleEn : b.titlePt;
             const handle = b.handle || (isEn() ? b.handleEn : b.handlePt);
             const ability = isEn() ? b.abilityEn : b.abilityPt;
+            const safeBondUrl = formatExternalUrl(b.url);
             return `
-              <a href="${b.url}" ${b.url.startsWith("#") ? "" : 'target="_blank" rel="noopener"'} class="tarot-card" data-bond-url="${b.url}">
+              <a href="${safeBondUrl}" ${safeBondUrl.startsWith("#") ? "" : 'target="_blank" rel="noopener"'} class="tarot-card" data-bond-url="${safeBondUrl}">
                 <div>
                   <div class="tarot-roman">
                     <span>${b.arcanaNum}</span>

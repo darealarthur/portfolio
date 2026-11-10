@@ -16,6 +16,14 @@ class P5VisualEditor {
       .replace(/>/g, "&gt;");
   }
 
+  // Garante que qualquer link digitado sem "https://" (ex: "alivegg.gamer.free") receba "https://" automaticamente!
+  normalizeExternalUrl(rawUrl) {
+    const u = String(rawUrl || "").trim();
+    if (!u || u === "#") return u;
+    if (/^(https?:\/\/|mailto:|tel:|#)/i.test(u)) return u;
+    return `https://${u.replace(/^\/+/, "")}`;
+  }
+
   // Salva todo o objeto PORTFOLIO_DATA no localStorage e atualiza o site ao vivo
   saveAllToStorage(appCallbacks) {
     try {
@@ -963,8 +971,8 @@ window.PORTFOLIO_DATA = ${jsonString};
         proj.summaryEn = card.querySelector(".ed-proj-sen").value.trim();
         proj.impactPt = card.querySelector(".ed-proj-ipt").value.trim();
         proj.impactEn = card.querySelector(".ed-proj-ien").value.trim();
-        proj.demoUrl = card.querySelector(".ed-proj-demo").value.trim();
-        proj.repoUrl = card.querySelector(".ed-proj-repo").value.trim();
+        proj.demoUrl = this.normalizeExternalUrl(card.querySelector(".ed-proj-demo").value);
+        proj.repoUrl = this.normalizeExternalUrl(card.querySelector(".ed-proj-repo").value);
       });
     } else if (this.activeTab === "equip") {
       containerEl.querySelectorAll("[data-slot-idx]").forEach((card) => {
@@ -1057,7 +1065,7 @@ window.PORTFOLIO_DATA = ${jsonString};
         b.titlePt = card.querySelector(".ed-bd-tpt").value.trim();
         b.titleEn = card.querySelector(".ed-bd-ten").value.trim();
         b.handle = card.querySelector(".ed-bd-handle").value.trim();
-        b.url = card.querySelector(".ed-bd-url").value.trim();
+        b.url = this.normalizeExternalUrl(card.querySelector(".ed-bd-url").value);
         b.abilityPt = card.querySelector(".ed-bd-abpt").value.trim();
         b.abilityEn = card.querySelector(".ed-bd-aben").value.trim();
       });
