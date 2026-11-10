@@ -562,16 +562,26 @@ window.PORTFOLIO_DATA = ${jsonString};
     const slots = window.PORTFOLIO_DATA.equipment.slots;
     return `
       <div class="system-box">
-        <h3>★ EDITAR CATEGORIAS DE TECNOLOGIAS & BARRAS DE MAESTRIA</h3>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+          <h3 style="margin:0;">★ CATEGORIAS DE TECNOLOGIAS (${slots.length})</h3>
+          <button type="button" class="p5-action-btn" id="btn-add-equip-slot" style="padding:7px 16px;font-size:0.95rem;">
+            <span>+ ADICIONAR CATEGORIA</span>
+          </button>
+        </div>
         ${slots
           .map(
             (slot, sIdx) => `
             <div class="editor-item-card" data-slot-idx="${sIdx}">
               <div class="editor-item-header">
-                <span class="editor-item-title">SLOT #${sIdx + 1}: ${this.escapeAttr(slot.slotTypePt)}</span>
-                <button type="button" class="editor-mini-btn btn-add-tech-item" data-slot="${sIdx}">
-                  + ADICIONAR SKILL NESTE SLOT
-                </button>
+                <span class="editor-item-title">CATEGORIA #${sIdx + 1}: ${this.escapeAttr(slot.slotTypePt)}</span>
+                <div style="display:flex;gap:8px;">
+                  <button type="button" class="editor-mini-btn btn-add-tech-item" data-slot="${sIdx}">
+                    + ADICIONAR SKILL
+                  </button>
+                  <button type="button" class="editor-mini-btn danger btn-del-equip-slot" data-slot="${sIdx}">
+                    ✕ EXCLUIR CATEGORIA
+                  </button>
+                </div>
               </div>
 
               <div class="p5-form-row-2">
@@ -650,7 +660,10 @@ window.PORTFOLIO_DATA = ${jsonString};
     const info = window.PORTFOLIO_DATA.personaInfo;
     return `
       <div class="system-box">
-        <h3>★ ATRIBUTOS DE BATALHA DEV & NOME DA PERSONA</h3>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+          <h3 style="margin:0;">★ ATRIBUTOS DE BATALHA DEV & NOME DA PERSONA (${info.stats.length})</h3>
+          <button type="button" class="editor-mini-btn" id="btn-add-pstat">+ ADICIONAR ATRIBUTO</button>
+        </div>
         <div class="p5-form-row-2" style="margin-bottom:14px;">
           <div class="p5-field">
             <label>NOME DA PERSONA (PT-BR)</label>
@@ -665,10 +678,13 @@ window.PORTFOLIO_DATA = ${jsonString};
         ${info.stats
           .map(
             (st, i) => `
-            <div class="p5-form-row-3 ed-pstat-row" data-stat-idx="${i}" style="margin-bottom:8px;">
+            <div class="p5-form-row-3 ed-pstat-row" data-stat-idx="${i}" style="margin-bottom:8px;align-items:center;">
               <input type="text" class="p5-input ed-pstat-lpt" value="${this.escapeAttr(st.labelPt)}" placeholder="Rótulo PT" />
               <input type="text" class="p5-input ed-pstat-len" value="${this.escapeAttr(st.labelEn)}" placeholder="Label EN" />
-              <input type="number" class="p5-input ed-pstat-val" value="${this.escapeAttr(st.val)}" min="0" max="100" />
+              <div style="display:flex;gap:6px;align-items:center;">
+                <input type="number" class="p5-input ed-pstat-val" value="${this.escapeAttr(st.val)}" min="0" max="100" />
+                <button type="button" class="editor-mini-btn danger btn-del-pstat" data-idx="${i}" title="Excluir atributo">✕</button>
+              </div>
             </div>
           `
           )
@@ -1246,11 +1262,9 @@ window.PORTFOLIO_DATA = ${jsonString};
         btn.addEventListener("click", () => {
           this.collectCurrentTabValues(containerEl);
           const idx = Number(btn.dataset.idx);
-          if (D.projects.length > 1) {
-            D.projects.splice(idx, 1);
-            this.saveAllToStorage(appCallbacks);
-            this.render(containerEl, appCallbacks);
-          }
+          D.projects.splice(idx, 1);
+          this.saveAllToStorage(appCallbacks);
+          this.render(containerEl, appCallbacks);
         });
       });
 
@@ -1285,6 +1299,49 @@ window.PORTFOLIO_DATA = ${jsonString};
 
     // Eventos da Aba 4 (Tecnologias)
     if (this.activeTab === "equip") {
+      const addSlotBtn = containerEl.querySelector("#btn-add-equip-slot");
+      if (addSlotBtn) {
+        addSlotBtn.addEventListener("click", () => {
+          this.collectCurrentTabValues(containerEl);
+          D.equipment.slots.push({
+            id: "slot-" + Date.now(),
+            slotTypePt: "NOVA CATEGORIA",
+            slotTypeEn: "NEW CATEGORY",
+            equippedNamePt: "Stack Principal",
+            equippedNameEn: "Primary Stack",
+            statLabelPt: "ATQ",
+            statLabelEn: "ATK",
+            statValue: 250,
+            subStatLabelPt: "VEL",
+            subStatLabelEn: "SPD",
+            subStatValue: 95,
+            descriptionPt: "Descrição das tecnologias desta categoria.",
+            descriptionEn: "Description of the technologies in this category.",
+            items: [
+              {
+                namePt: "Nova Tecnologia",
+                nameEn: "New Technology",
+                power: 90,
+                mastery: "MAX",
+                tag: "Tech"
+              }
+            ]
+          });
+          this.saveAllToStorage(appCallbacks);
+          this.render(containerEl, appCallbacks);
+        });
+      }
+
+      containerEl.querySelectorAll(".btn-del-equip-slot").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          this.collectCurrentTabValues(containerEl);
+          const sIdx = Number(btn.dataset.slot);
+          D.equipment.slots.splice(sIdx, 1);
+          this.saveAllToStorage(appCallbacks);
+          this.render(containerEl, appCallbacks);
+        });
+      });
+
       containerEl.querySelectorAll(".btn-add-tech-item").forEach((btn) => {
         btn.addEventListener("click", () => {
           this.collectCurrentTabValues(containerEl);
@@ -1306,17 +1363,39 @@ window.PORTFOLIO_DATA = ${jsonString};
           this.collectCurrentTabValues(containerEl);
           const sIdx = Number(btn.dataset.slot);
           const iIdx = Number(btn.dataset.item);
-          if (D.equipment.slots[sIdx].items.length > 1) {
-            D.equipment.slots[sIdx].items.splice(iIdx, 1);
-            this.saveAllToStorage(appCallbacks);
-            this.render(containerEl, appCallbacks);
-          }
+          D.equipment.slots[sIdx].items.splice(iIdx, 1);
+          this.saveAllToStorage(appCallbacks);
+          this.render(containerEl, appCallbacks);
         });
       });
     }
 
     // Eventos da Aba 5 (Persona & Carreira)
     if (this.activeTab === "persona") {
+      const addPstatBtn = containerEl.querySelector("#btn-add-pstat");
+      if (addPstatBtn) {
+        addPstatBtn.addEventListener("click", () => {
+          this.collectCurrentTabValues(containerEl);
+          D.personaInfo.stats.push({
+            labelPt: "NOVO ATRIBUTO",
+            labelEn: "NEW STAT",
+            val: 95
+          });
+          this.saveAllToStorage(appCallbacks);
+          this.render(containerEl, appCallbacks);
+        });
+      }
+
+      containerEl.querySelectorAll(".btn-del-pstat").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          this.collectCurrentTabValues(containerEl);
+          const idx = Number(btn.dataset.idx);
+          D.personaInfo.stats.splice(idx, 1);
+          this.saveAllToStorage(appCallbacks);
+          this.render(containerEl, appCallbacks);
+        });
+      });
+
       const addTlBtn = containerEl.querySelector("#btn-add-timeline");
       if (addTlBtn) {
         addTlBtn.addEventListener("click", () => {
@@ -1339,11 +1418,9 @@ window.PORTFOLIO_DATA = ${jsonString};
         btn.addEventListener("click", () => {
           this.collectCurrentTabValues(containerEl);
           const idx = Number(btn.dataset.idx);
-          if (D.personaInfo.timeline.length > 1) {
-            D.personaInfo.timeline.splice(idx, 1);
-            this.saveAllToStorage(appCallbacks);
-            this.render(containerEl, appCallbacks);
-          }
+          D.personaInfo.timeline.splice(idx, 1);
+          this.saveAllToStorage(appCallbacks);
+          this.render(containerEl, appCallbacks);
         });
       });
 
@@ -1368,11 +1445,9 @@ window.PORTFOLIO_DATA = ${jsonString};
         btn.addEventListener("click", () => {
           this.collectCurrentTabValues(containerEl);
           const idx = Number(btn.dataset.idx);
-          if (D.personaInfo.skills.length > 1) {
-            D.personaInfo.skills.splice(idx, 1);
-            this.saveAllToStorage(appCallbacks);
-            this.render(containerEl, appCallbacks);
-          }
+          D.personaInfo.skills.splice(idx, 1);
+          this.saveAllToStorage(appCallbacks);
+          this.render(containerEl, appCallbacks);
         });
       });
     }
@@ -1404,11 +1479,9 @@ window.PORTFOLIO_DATA = ${jsonString};
         btn.addEventListener("click", () => {
           this.collectCurrentTabValues(containerEl);
           const idx = Number(btn.dataset.idx);
-          if (D.bonds.length > 1) {
-            D.bonds.splice(idx, 1);
-            this.saveAllToStorage(appCallbacks);
-            this.render(containerEl, appCallbacks);
-          }
+          D.bonds.splice(idx, 1);
+          this.saveAllToStorage(appCallbacks);
+          this.render(containerEl, appCallbacks);
         });
       });
     }

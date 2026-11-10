@@ -340,7 +340,11 @@
   // --------------------------------------------------------------------------
   function renderItemProjectsView() {
     const ui = tUI().itemView;
-    const projects = DATA.projects;
+    const projects = DATA.projects || [];
+    if (projects.length === 0) {
+      subscreenBodyEl.innerHTML = `<div class="system-box"><h3>Nenhum projeto cadastrado ainda.</h3></div>`;
+      return;
+    }
     const activeProj = projects[state.selectedProjectIdx] || projects[0];
     const title = isEn() ? activeProj.titleEn : activeProj.titlePt;
     const cat = isEn() ? activeProj.categoryEn : activeProj.categoryPt;
@@ -426,7 +430,11 @@
   // VIEW 2: TECNOLOGIAS / EQUIP
   // --------------------------------------------------------------------------
   function renderEquipSkillsView() {
-    const slots = DATA.equipment.slots;
+    const slots = DATA.equipment.slots || [];
+    if (slots.length === 0) {
+      subscreenBodyEl.innerHTML = `<div class="system-box"><h3>Nenhuma categoria de tecnologia cadastrada.</h3></div>`;
+      return;
+    }
     const activeSlot = slots[state.selectedEquipSlotIdx] || slots[0];
     const activeType = isEn() ? activeSlot.slotTypeEn : activeSlot.slotTypePt;
     const activeName = isEn() ? activeSlot.equippedNameEn : activeSlot.equippedNamePt;
@@ -530,66 +538,83 @@
             ${bio}
           </p>
 
-          <h3 style="font-family:var(--font-display);font-size:1.3rem;color:var(--p5-yellow);border-bottom:2px solid #fff;padding-bottom:4px;">
-            ${ui.historyTitle}
-          </h3>
-          ${info.timeline
-            .map((t) => {
-              const period = isEn() ? t.periodEn : t.periodPt;
-              const tRole = isEn() ? t.roleEn : t.rolePt;
-              const tDesc = isEn() ? t.descEn : t.descPt;
-              return `
-                <div class="timeline-item">
-                  <div class="timeline-period">${period} // ${t.company}</div>
-                  <strong style="font-size:1.02rem;display:block;margin:2px 0;">${tRole}</strong>
-                  <p style="font-size:0.88rem;color:#ccc;">${tDesc}</p>
-                </div>
-              `;
-            })
-            .join("")}
+          ${
+            info.timeline && info.timeline.length > 0
+              ? `
+                <h3 style="font-family:var(--font-display);font-size:1.3rem;color:var(--p5-yellow);border-bottom:2px solid #fff;padding-bottom:4px;">
+                  ${ui.historyTitle}
+                </h3>
+                ${info.timeline
+                  .map((t) => {
+                    const period = isEn() ? t.periodEn : t.periodPt;
+                    const tRole = isEn() ? t.roleEn : t.rolePt;
+                    const tDesc = isEn() ? t.descEn : t.descPt;
+                    return `
+                      <div class="timeline-item">
+                        <div class="timeline-period">${period}${t.company ? ` // ${t.company}` : ""}</div>
+                        <strong style="font-size:1.02rem;display:block;margin:2px 0;">${tRole}</strong>
+                        <p style="font-size:0.88rem;color:#ccc;">${tDesc}</p>
+                      </div>
+                    `;
+                  })
+                  .join("")}
+              `
+              : ""
+          }
         </div>
 
         <div class="persona-skills-card">
-          <span class="persona-header-badge">${pName}</span>
-          <h3 style="font-family:var(--font-display);font-size:1.45rem;margin-bottom:12px;">
-            ${ui.battleStatsTitle}
-          </h3>
+          ${pName ? `<span class="persona-header-badge">${pName}</span>` : ""}
+          ${
+            info.stats && info.stats.length > 0
+              ? `
+                <h3 style="font-family:var(--font-display);font-size:1.45rem;margin-bottom:12px;">
+                  ${ui.battleStatsTitle}
+                </h3>
+                ${info.stats
+                  .map((st) => {
+                    const lbl = isEn() ? st.labelEn : st.labelPt;
+                    return `
+                      <div class="skill-bar-row">
+                        <div class="skill-bar-top">
+                          <span>${lbl}</span>
+                          <span style="font-family:var(--font-display);font-size:1.1rem;color:var(--p5-yellow)">${st.val}</span>
+                        </div>
+                        <div class="skill-bar-track">
+                          <div class="skill-bar-fill" style="width:${st.val}%"></div>
+                        </div>
+                      </div>
+                    `;
+                  })
+                  .join("")}
+              `
+              : ""
+          }
 
-          ${info.stats
-            .map((st) => {
-              const lbl = isEn() ? st.labelEn : st.labelPt;
-              return `
-                <div class="skill-bar-row">
-                  <div class="skill-bar-top">
-                    <span>${lbl}</span>
-                    <span style="font-family:var(--font-display);font-size:1.1rem;color:var(--p5-yellow)">${st.val}</span>
-                  </div>
-                  <div class="skill-bar-track">
-                    <div class="skill-bar-fill" style="width:${st.val}%"></div>
-                  </div>
+          ${
+            info.skills && info.skills.length > 0
+              ? `
+                <h3 style="font-family:var(--font-display);font-size:1.35rem;margin-top:18px;color:var(--p5-yellow);">
+                  ${ui.activeSkillsTitle}
+                </h3>
+                <div class="persona-skill-grid">
+                  ${info.skills
+                    .map((sk) => {
+                      const sName = isEn() ? sk.nameEn : sk.namePt;
+                      const sCost = isEn() ? sk.costEn : sk.costPt;
+                      const sDesc = isEn() ? sk.descEn : sk.descPt;
+                      return `
+                        <div class="persona-skill-item">
+                          <strong>★ ${sName} <small style="color:#fff;float:right">${sCost}</small></strong>
+                          <span style="font-size:0.8rem;color:#ddd;">${sDesc}</span>
+                        </div>
+                      `;
+                    })
+                    .join("")}
                 </div>
-              `;
-            })
-            .join("")}
-
-          <h3 style="font-family:var(--font-display);font-size:1.35rem;margin-top:18px;color:var(--p5-yellow);">
-            ${ui.activeSkillsTitle}
-          </h3>
-          <div class="persona-skill-grid">
-            ${info.skills
-              .map((sk) => {
-                const sName = isEn() ? sk.nameEn : sk.namePt;
-                const sCost = isEn() ? sk.costEn : sk.costPt;
-                const sDesc = isEn() ? sk.descEn : sk.descPt;
-                return `
-                  <div class="persona-skill-item">
-                    <strong>★ ${sName} <small style="color:#fff;float:right">${sCost}</small></strong>
-                    <span style="font-size:0.8rem;color:#ddd;">${sDesc}</span>
-                  </div>
-                `;
-              })
-              .join("")}
-          </div>
+              `
+              : ""
+          }
         </div>
       </div>
     `;
