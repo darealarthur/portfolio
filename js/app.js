@@ -362,6 +362,7 @@
                 <div class="p5-project-row ${i === state.selectedProjectIdx ? "is-active" : ""}" data-proj-idx="${i}">
                   <div class="proj-row-left">
                     <span class="proj-rarity">${p.rarity}</span>
+                    ${p.iconUrl ? `<img src="${p.iconUrl}" alt="" class="p5-inline-logo" style="width:26px;height:26px;" />` : ""}
                     <span class="proj-title">${pTitle}</span>
                     ${p.isNew ? `<span class="proj-new-badge">${ui.newBadge}</span>` : ""}
                   </div>
@@ -374,7 +375,10 @@
 
         <div class="p5-project-detail">
           <div class="detail-header-banner">
-            <h2>${title}</h2>
+            <h2 style="display:flex;align-items:center;gap:10px;">
+              ${activeProj.iconUrl ? `<img src="${activeProj.iconUrl}" alt="" class="p5-inline-logo" />` : ""}
+              <span>${title}</span>
+            </h2>
             <span class="proj-new-badge">${cat}</span>
           </div>
 
@@ -478,7 +482,10 @@
               return `
                 <div class="skill-bar-row">
                   <div class="skill-bar-top">
-                    <span>★ ${iName} <small style="color:var(--p5-yellow)">[${it.tag}]</small></span>
+                    <span style="display:inline-flex;align-items:center;gap:6px;">
+                      ${it.iconUrl ? `<img src="${it.iconUrl}" alt="" class="p5-inline-logo" style="width:22px;height:22px;" />` : "★"}
+                      ${iName} <small style="color:var(--p5-yellow)">[${it.tag}]</small>
+                    </span>
                     <span style="color:var(--p5-yellow)">${it.mastery} (${it.power}%)</span>
                   </div>
                   <div class="skill-bar-track">
@@ -739,7 +746,10 @@
                     <span>${b.arcanaNum}</span>
                     <span style="font-size:0.8rem;letter-spacing:1px;">${arcName}</span>
                   </div>
-                  <div class="tarot-title">${title}</div>
+                  <div class="tarot-title">
+                    ${b.iconUrl ? `<img src="${b.iconUrl}" alt="" class="p5-inline-logo" />` : ""}
+                    <span>${title}</span>
+                  </div>
                   <div style="font-weight:800;color:var(--p5-red);margin-bottom:8px;">${handle}</div>
                   <p style="font-size:0.85rem;line-height:1.4;opacity:0.9;">${ability}</p>
                 </div>

@@ -575,6 +575,18 @@
   font-family: var(--font-display);
   font-size: 1.55rem;
   margin: 12px 0 4px 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.p5-inline-logo {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  flex-shrink: 0;
+  border-radius: 4px;
+  filter: drop-shadow(-2px 2px 0 rgba(0, 0, 0, 0.75));
 }
 
 .tarot-stars {

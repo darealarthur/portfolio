@@ -20,8 +20,37 @@ class P5VisualEditor {
   normalizeExternalUrl(rawUrl) {
     const u = String(rawUrl || "").trim();
     if (!u || u === "#") return u;
-    if (/^(https?:\/\/|mailto:|tel:|#)/i.test(u)) return u;
+    if (/^(https?:\/\/|mailto:|tel:|data:|#)/i.test(u)) return u;
     return `https://${u.replace(/^\/+/, "")}`;
+  }
+
+  // Converte um arquivo de imagem (PNG, SVG, JPG, WEBP) em DataURL leve (máx 128x128) para salvar no Supabase!
+  processLogoFile(file, callback) {
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const img = new Image();
+      img.onload = () => {
+        const maxDim = 128;
+        let w = img.width || 64;
+        let h = img.height || 64;
+        if (w > maxDim || h > maxDim) {
+          const ratio = Math.min(maxDim / w, maxDim / h);
+          w = Math.round(w * ratio);
+          h = Math.round(h * ratio);
+        }
+        const canvas = document.createElement("canvas");
+        canvas.width = w;
+        canvas.height = h;
+        const ctx = canvas.getContext("2d");
+        ctx.clearRect(0, 0, w, h);
+        ctx.drawImage(img, 0, 0, w, h);
+        callback(canvas.toDataURL("image/png"));
+      };
+      img.onerror = () => callback(ev.target.result);
+      img.src = ev.target.result;
+    };
+    reader.readAsDataURL(file);
   }
 
   // Salva todo o objeto PORTFOLIO_DATA no localStorage e atualiza o site ao vivo
@@ -547,6 +576,19 @@ window.PORTFOLIO_DATA = ${jsonString};
                   <input type="text" class="p5-input ed-proj-repo" value="${this.escapeAttr(proj.repoUrl)}" />
                 </div>
               </div>
+
+              <div class="p5-field">
+                <label>LOGO / ÍCONE AO LADO DO NOME DO PROJETO (URL OU UPLOAD)</label>
+                <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+                  ${proj.iconUrl ? `<img src="${this.escapeAttr(proj.iconUrl)}" alt="" style="width:32px;height:32px;object-fit:contain;background:#222;padding:3px;border:1px solid #fff;" />` : ""}
+                  <input type="text" class="p5-input ed-proj-icon" value="${this.escapeAttr(proj.iconUrl || "")}" placeholder="Cole o link da imagem ou envie do PC ->" style="flex:1;min-width:180px;" />
+                  <label class="editor-mini-btn" style="cursor:pointer;margin:0;">
+                    📁 ENVIAR LOGO
+                    <input type="file" accept="image/*" class="ed-proj-icon-file" data-idx="${i}" hidden />
+                  </label>
+                  ${proj.iconUrl ? `<button type="button" class="editor-mini-btn danger btn-clear-proj-icon" data-idx="${i}">✕</button>` : ""}
+                </div>
+              </div>
             </div>
           `
           )
@@ -906,9 +948,24 @@ window.PORTFOLIO_DATA = ${jsonString};
                 </div>
               </div>
 
-              <div class="p5-field">
-                <label>URL DO LINK (Ex: https://github.com/seu-user ou mailto:email ou #request)</label>
-                <input type="text" class="p5-input ed-bd-url" value="${this.escapeAttr(b.url)}" />
+              <div class="p5-form-row-2">
+                <div class="p5-field">
+                  <label>URL DO LINK (Ex: https://github.com/seu-user)</label>
+                  <input type="text" class="p5-input ed-bd-url" value="${this.escapeAttr(b.url)}" />
+                </div>
+
+                <div class="p5-field">
+                  <label>LOGO / ÍCONE AO LADO DO TEXTO (URL OU UPLOAD DO PC)</label>
+                  <div style="display:flex;gap:8px;align-items:center;">
+                    ${b.iconUrl ? `<img src="${this.escapeAttr(b.iconUrl)}" alt="" style="width:32px;height:32px;object-fit:contain;background:#222;padding:3px;border:1px solid #fff;" />` : ""}
+                    <input type="text" class="p5-input ed-bd-icon" value="${this.escapeAttr(b.iconUrl || "")}" placeholder="URL da logo ou envie ->" style="flex:1;" />
+                    <label class="editor-mini-btn" style="cursor:pointer;margin:0;white-space:nowrap;">
+                      📁 LOGO DO PC
+                      <input type="file" accept="image/*" class="ed-bd-icon-file" data-idx="${i}" hidden />
+                    </label>
+                    ${b.iconUrl ? `<button type="button" class="editor-mini-btn danger btn-clear-bd-icon" data-idx="${i}" title="Remover logo">✕</button>` : ""}
+                  </div>
+                </div>
               </div>
 
               <div class="p5-form-row-2">
@@ -989,6 +1046,8 @@ window.PORTFOLIO_DATA = ${jsonString};
         proj.impactEn = card.querySelector(".ed-proj-ien").value.trim();
         proj.demoUrl = this.normalizeExternalUrl(card.querySelector(".ed-proj-demo").value);
         proj.repoUrl = this.normalizeExternalUrl(card.querySelector(".ed-proj-repo").value);
+        const iconIn = card.querySelector(".ed-proj-icon");
+        if (iconIn) proj.iconUrl = iconIn.value.trim();
       });
     } else if (this.activeTab === "equip") {
       containerEl.querySelectorAll("[data-slot-idx]").forEach((card) => {
@@ -1082,6 +1141,8 @@ window.PORTFOLIO_DATA = ${jsonString};
         b.titleEn = card.querySelector(".ed-bd-ten").value.trim();
         b.handle = card.querySelector(".ed-bd-handle").value.trim();
         b.url = this.normalizeExternalUrl(card.querySelector(".ed-bd-url").value);
+        const bdIconIn = card.querySelector(".ed-bd-icon");
+        if (bdIconIn) b.iconUrl = bdIconIn.value.trim();
         b.abilityPt = card.querySelector(".ed-bd-abpt").value.trim();
         b.abilityEn = card.querySelector(".ed-bd-aben").value.trim();
       });
@@ -1295,6 +1356,34 @@ window.PORTFOLIO_DATA = ${jsonString};
           }
         });
       });
+
+      containerEl.querySelectorAll(".ed-proj-icon-file").forEach((fileIn) => {
+        fileIn.addEventListener("change", (e) => {
+          const file = e.target.files && e.target.files[0];
+          if (!file) return;
+          this.collectCurrentTabValues(containerEl);
+          const idx = Number(fileIn.dataset.idx);
+          this.processLogoFile(file, (dataUrl) => {
+            if (D.projects[idx]) {
+              D.projects[idx].iconUrl = dataUrl;
+              this.saveAllToStorage(appCallbacks);
+              this.render(containerEl, appCallbacks);
+            }
+          });
+        });
+      });
+
+      containerEl.querySelectorAll(".btn-clear-proj-icon").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          this.collectCurrentTabValues(containerEl);
+          const idx = Number(btn.dataset.idx);
+          if (D.projects[idx]) {
+            D.projects[idx].iconUrl = "";
+            this.saveAllToStorage(appCallbacks);
+            this.render(containerEl, appCallbacks);
+          }
+        });
+      });
     }
 
     // Eventos da Aba 4 (Tecnologias)
@@ -1482,6 +1571,34 @@ window.PORTFOLIO_DATA = ${jsonString};
           D.bonds.splice(idx, 1);
           this.saveAllToStorage(appCallbacks);
           this.render(containerEl, appCallbacks);
+        });
+      });
+
+      containerEl.querySelectorAll(".ed-bd-icon-file").forEach((fileIn) => {
+        fileIn.addEventListener("change", (e) => {
+          const file = e.target.files && e.target.files[0];
+          if (!file) return;
+          this.collectCurrentTabValues(containerEl);
+          const idx = Number(fileIn.dataset.idx);
+          this.processLogoFile(file, (dataUrl) => {
+            if (D.bonds[idx]) {
+              D.bonds[idx].iconUrl = dataUrl;
+              this.saveAllToStorage(appCallbacks);
+              this.render(containerEl, appCallbacks);
+            }
+          });
+        });
+      });
+
+      containerEl.querySelectorAll(".btn-clear-bd-icon").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          this.collectCurrentTabValues(containerEl);
+          const idx = Number(btn.dataset.idx);
+          if (D.bonds[idx]) {
+            D.bonds[idx].iconUrl = "";
+            this.saveAllToStorage(appCallbacks);
+            this.render(containerEl, appCallbacks);
+          }
         });
       });
     }
