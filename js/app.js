@@ -456,7 +456,10 @@
               return `
                 <div class="equip-slot-card ${i === state.selectedEquipSlotIdx ? "is-active" : ""}" data-slot-idx="${i}">
                   <div class="slot-type-label">${sType}</div>
-                  <div class="slot-equipped-name">${sName}</div>
+                  <div class="slot-equipped-name" style="display:flex;align-items:center;gap:10px;">
+                    ${slot.iconUrl ? `<img src="${slot.iconUrl}" alt="" class="p5-inline-logo" style="width:28px;height:28px;" />` : ""}
+                    <span>${sName}</span>
+                  </div>
                   <div class="slot-stats-row">
                     <span>${stLbl}: <strong>${slot.statValue}</strong></span>
                     <span>${subLbl}: <strong>${slot.subStatValue}</strong></span>
@@ -469,8 +472,9 @@
 
         <div class="equip-items-panel">
           <div class="persona-header-badge">${activeType}</div>
-          <h3 style="font-family:var(--font-display);font-size:1.65rem;margin-bottom:8px;">
-            ${activeName}
+          <h3 style="font-family:var(--font-display);font-size:1.65rem;margin-bottom:8px;display:flex;align-items:center;gap:10px;">
+            ${activeSlot.iconUrl ? `<img src="${activeSlot.iconUrl}" alt="" class="p5-inline-logo" style="width:32px;height:32px;" />` : ""}
+            <span>${activeName}</span>
           </h3>
           <p style="color:#ddd;margin-bottom:18px;font-size:0.95rem;line-height:1.5;">
             ${activeDesc}

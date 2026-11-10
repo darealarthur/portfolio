@@ -666,6 +666,19 @@ window.PORTFOLIO_DATA = ${jsonString};
                 </div>
               </div>
 
+              <div class="p5-field">
+                <label>LOGO / IMAGEM AO LADO DO NOME DA CATEGORIA (Ex: HTML5, CSS3)</label>
+                <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+                  ${slot.iconUrl ? `<img src="${this.escapeAttr(slot.iconUrl)}" alt="" style="width:32px;height:32px;object-fit:contain;background:#222;padding:3px;border:1px solid #fff;" />` : ""}
+                  <input type="text" class="p5-input ed-slot-icon" value="${this.escapeAttr(slot.iconUrl || "")}" placeholder="URL da imagem ou envie do PC ->" style="flex:1;min-width:180px;" />
+                  <label class="editor-mini-btn" style="cursor:pointer;margin:0;white-space:nowrap;">
+                    📁 LOGO DO PC
+                    <input type="file" accept="image/*" class="ed-slot-icon-file" data-slot="${sIdx}" hidden />
+                  </label>
+                  ${slot.iconUrl ? `<button type="button" class="editor-mini-btn danger btn-clear-slot-icon" data-slot="${sIdx}" title="Remover logo">✕</button>` : ""}
+                </div>
+              </div>
+
               <div style="margin-top:10px;border-top:1px dashed #444;padding-top:10px;">
                 <label style="font-family:var(--font-display);color:var(--p5-yellow);display:block;margin-bottom:8px;">
                   LISTA DE TECNOLOGIAS DESTE SLOT:
@@ -673,14 +686,25 @@ window.PORTFOLIO_DATA = ${jsonString};
                 ${slot.items
                   .map(
                     (it, iIdx) => `
-                    <div class="p5-form-row-3 ed-tech-row" data-item-idx="${iIdx}" style="margin-bottom:8px;align-items:center;background:#1a1a1a;padding:8px;border:1px solid #333;">
-                      <input type="text" class="p5-input ed-tech-npt" value="${this.escapeAttr(it.namePt)}" placeholder="Nome PT" />
-                      <input type="text" class="p5-input ed-tech-nen" value="${this.escapeAttr(it.nameEn)}" placeholder="Nome EN" />
-                      <div style="display:flex;gap:6px;align-items:center;">
-                        <input type="text" class="p5-input ed-tech-tag" value="${this.escapeAttr(it.tag)}" style="width:85px" placeholder="Tag" />
-                        <input type="text" class="p5-input ed-tech-mast" value="${this.escapeAttr(it.mastery)}" style="width:65px" placeholder="MAX" />
-                        <input type="number" class="p5-input ed-tech-pwr" value="${this.escapeAttr(it.power)}" min="0" max="100" style="width:70px" title="Porcentagem (0-100)" />
-                        <button type="button" class="editor-mini-btn danger btn-del-tech-item" data-slot="${sIdx}" data-item="${iIdx}">✕</button>
+                    <div class="ed-tech-row" data-item-idx="${iIdx}" style="margin-bottom:10px;background:#1a1a1a;padding:10px;border:1px solid #333;">
+                      <div class="p5-form-row-3" style="align-items:center;margin-bottom:6px;">
+                        <input type="text" class="p5-input ed-tech-npt" value="${this.escapeAttr(it.namePt)}" placeholder="Nome PT" />
+                        <input type="text" class="p5-input ed-tech-nen" value="${this.escapeAttr(it.nameEn)}" placeholder="Nome EN" />
+                        <div style="display:flex;gap:6px;align-items:center;">
+                          <input type="text" class="p5-input ed-tech-tag" value="${this.escapeAttr(it.tag)}" style="width:85px" placeholder="Tag" />
+                          <input type="text" class="p5-input ed-tech-mast" value="${this.escapeAttr(it.mastery)}" style="width:65px" placeholder="MAX" />
+                          <input type="number" class="p5-input ed-tech-pwr" value="${this.escapeAttr(it.power)}" min="0" max="100" style="width:70px" title="Porcentagem (0-100)" />
+                          <button type="button" class="editor-mini-btn danger btn-del-tech-item" data-slot="${sIdx}" data-item="${iIdx}">✕</button>
+                        </div>
+                      </div>
+                      <div style="display:flex;gap:8px;align-items:center;">
+                        ${it.iconUrl ? `<img src="${this.escapeAttr(it.iconUrl)}" alt="" style="width:24px;height:24px;object-fit:contain;background:#222;padding:2px;border:1px solid #fff;" />` : ""}
+                        <input type="text" class="p5-input ed-tech-icon" value="${this.escapeAttr(it.iconUrl || "")}" placeholder="Logo desta skill (URL ou envie do PC ->)" style="flex:1;padding:5px 8px;font-size:0.84rem;" />
+                        <label class="editor-mini-btn" style="cursor:pointer;margin:0;white-space:nowrap;">
+                          📁 LOGO
+                          <input type="file" accept="image/*" class="ed-tech-icon-file" data-slot="${sIdx}" data-item="${iIdx}" hidden />
+                        </label>
+                        ${it.iconUrl ? `<button type="button" class="editor-mini-btn danger btn-clear-tech-icon" data-slot="${sIdx}" data-item="${iIdx}" title="Remover logo">✕</button>` : ""}
                       </div>
                     </div>
                   `
@@ -1062,6 +1086,8 @@ window.PORTFOLIO_DATA = ${jsonString};
         slot.subStatValue = Number(card.querySelector(".ed-slot-val2").value) || 100;
         slot.descriptionPt = card.querySelector(".ed-slot-dpt").value.trim();
         slot.descriptionEn = card.querySelector(".ed-slot-den").value.trim();
+        const slotIconIn = card.querySelector(".ed-slot-icon");
+        if (slotIconIn) slot.iconUrl = slotIconIn.value.trim();
 
         card.querySelectorAll(".ed-tech-row").forEach((row) => {
           const iIdx = Number(row.dataset.itemIdx);
@@ -1072,6 +1098,8 @@ window.PORTFOLIO_DATA = ${jsonString};
           it.tag = row.querySelector(".ed-tech-tag").value.trim();
           it.mastery = row.querySelector(".ed-tech-mast").value.trim();
           it.power = Math.min(100, Math.max(0, Number(row.querySelector(".ed-tech-pwr").value) || 0));
+          const techIconIn = row.querySelector(".ed-tech-icon");
+          if (techIconIn) it.iconUrl = techIconIn.value.trim();
         });
       });
     } else if (this.activeTab === "persona") {
@@ -1455,6 +1483,64 @@ window.PORTFOLIO_DATA = ${jsonString};
           D.equipment.slots[sIdx].items.splice(iIdx, 1);
           this.saveAllToStorage(appCallbacks);
           this.render(containerEl, appCallbacks);
+        });
+      });
+
+      containerEl.querySelectorAll(".ed-slot-icon-file").forEach((fileIn) => {
+        fileIn.addEventListener("change", (e) => {
+          const file = e.target.files && e.target.files[0];
+          if (!file) return;
+          this.collectCurrentTabValues(containerEl);
+          const sIdx = Number(fileIn.dataset.slot);
+          this.processLogoFile(file, (dataUrl) => {
+            if (D.equipment.slots[sIdx]) {
+              D.equipment.slots[sIdx].iconUrl = dataUrl;
+              this.saveAllToStorage(appCallbacks);
+              this.render(containerEl, appCallbacks);
+            }
+          });
+        });
+      });
+
+      containerEl.querySelectorAll(".btn-clear-slot-icon").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          this.collectCurrentTabValues(containerEl);
+          const sIdx = Number(btn.dataset.slot);
+          if (D.equipment.slots[sIdx]) {
+            D.equipment.slots[sIdx].iconUrl = "";
+            this.saveAllToStorage(appCallbacks);
+            this.render(containerEl, appCallbacks);
+          }
+        });
+      });
+
+      containerEl.querySelectorAll(".ed-tech-icon-file").forEach((fileIn) => {
+        fileIn.addEventListener("change", (e) => {
+          const file = e.target.files && e.target.files[0];
+          if (!file) return;
+          this.collectCurrentTabValues(containerEl);
+          const sIdx = Number(fileIn.dataset.slot);
+          const iIdx = Number(fileIn.dataset.item);
+          this.processLogoFile(file, (dataUrl) => {
+            if (D.equipment.slots[sIdx] && D.equipment.slots[sIdx].items[iIdx]) {
+              D.equipment.slots[sIdx].items[iIdx].iconUrl = dataUrl;
+              this.saveAllToStorage(appCallbacks);
+              this.render(containerEl, appCallbacks);
+            }
+          });
+        });
+      });
+
+      containerEl.querySelectorAll(".btn-clear-tech-icon").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          this.collectCurrentTabValues(containerEl);
+          const sIdx = Number(btn.dataset.slot);
+          const iIdx = Number(btn.dataset.item);
+          if (D.equipment.slots[sIdx] && D.equipment.slots[sIdx].items[iIdx]) {
+            D.equipment.slots[sIdx].items[iIdx].iconUrl = "";
+            this.saveAllToStorage(appCallbacks);
+            this.render(containerEl, appCallbacks);
+          }
         });
       });
     }
