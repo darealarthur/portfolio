@@ -9,8 +9,7 @@ class P5AudioEngine {
     this.ctx = null;
     this.sfxEnabled = true;
     this.bgmEnabled = false;
-    this.bgmInterval = null;
-    this.bgmStep = 0;
+    this.bgmPlayer = null;
   }
 
   init() {
@@ -176,80 +175,24 @@ class P5AudioEngine {
     });
   }
 
-  // Groove Acid-Jazz procedural opcional (estilo Beneath the Mask / Tokyo Daylight)
+  // Trilha sonora oficial Acid-Jazz (assets/bgm.mp3) em loop contínuo
   toggleBGM(forceState) {
-    this.init();
     this.bgmEnabled = typeof forceState === "boolean" ? forceState : !this.bgmEnabled;
 
+    if (!this.bgmPlayer) {
+      this.bgmPlayer = new Audio("assets/bgm.mp3");
+      this.bgmPlayer.loop = true;
+      this.bgmPlayer.volume = 0.45;
+    }
+
     if (!this.bgmEnabled) {
-      if (this.bgmInterval) {
-        clearInterval(this.bgmInterval);
-        this.bgmInterval = null;
-      }
+      this.bgmPlayer.pause();
       return false;
     }
 
-    if (!this.ctx) return false;
-
-    const bassline = [110, 0, 110, 130.81, 146.83, 0, 130.81, 164.81]; // A2 minor funk
-    const chords = [
-      [440, 523.25, 659.25, 783.99], // Am7
-      [392, 493.88, 587.33, 739.99]  // Gmaj7
-    ];
-
-    this.bgmStep = 0;
-    if (this.bgmInterval) clearInterval(this.bgmInterval);
-
-    this.bgmInterval = setInterval(() => {
-      if (!this.bgmEnabled || !this.ctx) return;
-      const now = this.ctx.currentTime;
-      const step = this.bgmStep % 8;
-
-      // Bass note
-      const bassFreq = bassline[step];
-      if (bassFreq > 0) {
-        const osc = this.ctx.createOscillator();
-        const gain = this.ctx.createGain();
-        const filter = this.ctx.createBiquadFilter();
-        osc.type = "sawtooth";
-        osc.frequency.setValueAtTime(bassFreq, now);
-
-        filter.type = "lowpass";
-        filter.frequency.setValueAtTime(520, now);
-        filter.frequency.exponentialRampToValueAtTime(160, now + 0.18);
-
-        gain.gain.setValueAtTime(0.055, now);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.21);
-
-        osc.connect(filter);
-        filter.connect(gain);
-        gain.connect(this.ctx.destination);
-        osc.start(now);
-        osc.stop(now + 0.22);
-      }
-
-      // Rhodes electric piano chord on steps 0 and 4
-      if (step === 0 || step === 4) {
-        const activeChord = chords[Math.floor(this.bgmStep / 8) % chords.length];
-        activeChord.forEach((f) => {
-          const osc = this.ctx.createOscillator();
-          const gain = this.ctx.createGain();
-          osc.type = "sine";
-          osc.frequency.setValueAtTime(f, now);
-
-          gain.gain.setValueAtTime(0.022, now);
-          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.65);
-
-          osc.connect(gain);
-          gain.connect(this.ctx.destination);
-          osc.start(now);
-          osc.stop(now + 0.68);
-        });
-      }
-
-      this.bgmStep++;
-    }, 240);
-
+    this.bgmPlayer.play().catch((err) => {
+      console.warn("Reprodução bloqueada até interação do usuário:", err);
+    });
     return true;
   }
 }
