@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PHANTOM PORTFOLIO // Persona 5 Interactive Experience</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Bangers&family=Bebas+Neue&family=Chakra+Petch:ital,wght@0,600;0,700;1,700&family=Permanent+Marker&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="css/style.css?v=7" />
+  <link rel="stylesheet" href="css/menu-arc.css?v=7" />
+  <link rel="stylesheet" href="css/subscreens.css?v=7" />
+</head>
+<body>
+  <!-- Viewport Wrapper que escala proporcionalmente o palco 1920x1080 sem distorcer nada -->
+  <main id="p5-stage" class="p5-stage" data-active-menu="item">
+
+    <!-- PALCO VIRTUAL 1920x1080 (Proporção 16:9 travada 1:1 com a referência de Persona 5 Strikers) -->
+    <div id="p5-virtual-stage" class="p5-virtual-stage">
+
+      <!-- ==================================================================
+           CAMADA 1: BACKGROUND DINÂMICO 1920x1080 (GRAFFITI + CORTE VERMELHO + PIXELS)
+           ================================================================== -->
+      <div id="p5-bg-wrapper" class="p5-bg-wrapper">
+        <svg class="p5-bg-svg" viewBox="0 0 1920 1080" width="1920" height="1080">
+          <!-- Base preta e parede escura esquerda -->
+          <rect width="1920" height="1080" fill="#050505" />
+          <polygon points="0,0 760,0 1080,1080 0,1080" fill="#1b191a" />
+
+          <!-- Graffiti escuro no lado esquerdo (fiel à referência) -->
+          <g stroke="#292627" stroke-width="10" fill="none">
+            <path d="M -20,390 Q 150,210 310,-10" stroke-width="15" />
+            <path d="M 120,0 L 90,130 L 220,100 L 195,230" stroke-width="9" />
+            <path d="M 20,450 C 130,410 230,460 270,560 C 300,640 190,720 95,700" stroke-width="16" />
+            <!-- Arte preta de rua no canto inferior esquerdo -->
+            <path d="M -10,500 C 190,460 245,580 180,660 C 250,690 220,810 110,830 L 295,960 L 210,1080 L -10,1080 Z" fill="#000000" stroke="none" />
+            <path d="M 160,840 L 340,760 L 290,940 L 440,890 L 390,1080" stroke="#0c0c0c" stroke-width="22" />
+          </g>
+
+          <!-- GRANDE CORTE DIAGONAL VERMELHO CARMESIM (Centro da tela) -->
+          <polygon id="p5-red-slash-poly" points="725,0 1315,0 1245,1080 715,1080 580,680" fill="#ff2220" />
+
+          <!-- Graffiti preto sobre o corte vermelho (exatamente nas posições da imagem!) -->
+          <g fill="#000000" stroke="#000000">
+            <!-- Linhas urbanas no topo sobre o vermelho (atrás de ITEM) -->
+            <path d="M 915,-10 L 945,195 L 1065,165 L 1040,285" fill="none" stroke="#000000" stroke-width="9" />
+            <path d="M 960,115 L 1045,140 L 1005,215 Z" />
+            <path d="M 1075,345 L 1110,520 L 1165,485 L 1145,355" fill="none" stroke="#000000" stroke-width="12" />
+
+            <!-- Bloco geométrico de graffiti atrás de STATS / BOND -->
+            <path d="M 765,425 L 915,400 L 925,475 L 885,485 L 910,595 L 975,545 L 930,635 L 775,665 L 750,515 Z" fill="none" stroke="#000000" stroke-width="14" />
+            <polygon points="785,445 840,435 850,505 795,515" fill="#000000" />
+            <polygon points="870,520 965,555 885,585" fill="#000000" />
+
+            <!-- Formas pontiagudas pretas/vermelhas atrás de REQUEST / SYSTEM -->
+            <polygon points="620,695 945,645 875,805 965,785 845,955 995,985 940,1080 540,1080" fill="#000000" />
+            <polygon points="755,705 925,660 845,785" fill="#ff2220" />
+            <polygon points="790,825 935,795 865,915" fill="#ff2220" />
+          </g>
+
+          <!-- Lado direito: Fundo preto profundo + Graffiti escuro inferior direito -->
+          <polygon points="1225,0 1920,0 1920,1080 1160,1080" fill="#030303" />
+          <g fill="#1b1b1b">
+            <polygon points="1610,790 1920,680 1920,1080 1540,1080" />
+            <path d="M 1690,830 L 1890,750 L 1840,960 L 1660,1030 Z" fill="#090909" />
+          </g>
+        </svg>
+
+        <!-- Grid de quadrados cinza-escuros flutuantes à direita de Joker -->
+        <div id="p5-pixel-grid" class="p5-pixel-grid" aria-hidden="true"></div>
+      </div>
+
+      <!-- ==================================================================
+           CAMADA 2: PERSONAGEM (JOKER HD + ¥14,128)
+           ================================================================== -->
+      <div id="p5-character-container" class="p5-character-container">
+        <div id="p5-character-pose-wrap" class="p5-character-pose-wrap">
+          <img
+            id="p5-char-main"
+            class="p5-char-img p5-char-main"
+            src="assets/joker-cutout.png?v=2"
+            alt="Joker Phantom Thief Avatar"
+          />
+        </div>
+
+        <!-- Badge de Ienes / XP inclinada sobre o casaco exatamente em (1504px, 791px) -->
+        <div id="p5-yen-badge" class="p5-yen-badge" title="Clique para ganhar XP / Ienes!">
+          <span class="p5-yen-text" id="p5-yen-value">¥14,128</span>
+        </div>
+
+        <!-- Assinatura no canto inferior direito igual à referência -->
+        <div class="p5-copyright-tag" id="p5-footer-credit">
+          ©ATLUS ©SEGA / PHANTOM DEV PORTFOLIO
+        </div>
+      </div>
+
+      <!-- ==================================================================
+           CAMADA 3: MENU EM ARCO 3D (POSICIONADO EM PIXELS EXATOS NO PALCO 1920x1080)
+           ================================================================== -->
+      <nav id="p5-menu-zone" class="p5-menu-zone" aria-label="Menu Principal Persona 5">
+        <ul id="p5-menu-list" class="p5-menu-list" role="menubar"></ul>
+      </nav>
+
+    </div><!-- /#p5-virtual-stage -->
+
+    <!-- ====================================================================
+         CAMADA 4: BARRA DE ATALHOS / HUD FLUTUANTE (FIXA NA VIEWPORT)
+         ==================================================================== -->
+    <header class="p5-hud-topbar" id="p5-hud-topbar">
+      <div class="p5-hud-pill p5-hud-profile" id="hud-open-persona" title="Ver Perfil">
+        <span class="hud-tag">CODENAME</span>
+        <strong id="hud-codename">JOKER</strong>
+        <span class="hud-lvl">LV.99</span>
+      </div>
+
+      <button type="button" class="p5-hud-btn" id="btn-toggle-labels" title="Alternar nomes do menu entre Persona 5 Original (ITEM, EQUIP...) e Português (PROJETOS, SKILLS...)">
+        <span class="btn-dot"></span>
+        <span id="label-mode-text">MENU: P5 ORIGINAL</span>
+      </button>
+
+      <button type="button" class="p5-hud-btn is-active" id="btn-toggle-sfx" title="Ativar/Desativar Efeitos Sonoros de Menu (Web Audio)">
+        <span>SFX: ON</span>
+      </button>
+
+      <button type="button" class="p5-hud-btn" id="btn-toggle-bgm" title="Tocar/Pausar Groove Acid-Jazz Procedural">
+        <span>BGM: OFF</span>
+      </button>
+
+      <button type="button" class="p5-hud-btn" id="btn-clean-hud" title="Ocultar/Mostrar barra superior para visualização limpa 1:1 com o jogo">
+        <span>HUD [H]</span>
+      </button>
+    </header>
+
+    <!-- Dica de controles no canto inferior esquerdo -->
+    <div class="p5-controls-hint" id="p5-controls-hint">
+      <span><kbd>↑</kbd><kbd>↓</kbd> ou <kbd>MOUSE</kbd> Navegar</span>
+      <span><kbd>ENTER</kbd> ou <kbd>CLICK</kbd> Abrir Seção</span>
+      <span><kbd>L</kbd> Alternar Idioma</span>
+    </div>
+
+    <!-- ====================================================================
+         CAMADA 5: TRANSIÇÃO DE CORTE DIAGONAL (SCREEN SLASH WIPE)
+         ==================================================================== -->
+    <div id="p5-slash-transition" class="p5-slash-transition" aria-hidden="true">
+      <div class="slash-shard shard-1"></div>
+      <div class="slash-shard shard-2"></div>
+      <div class="slash-shard shard-3"></div>
+      <div class="slash-star-burst" id="slash-star-burst">★</div>
+    </div>
+
+    <!-- ====================================================================
+         CAMADA 6: SUB-TELAS DO PORTFÓLIO
+         ==================================================================== -->
+    <section id="p5-subscreen-overlay" class="p5-subscreen-overlay" aria-hidden="true">
+      <div class="subscreen-backdrop" id="subscreen-backdrop"></div>
+
+      <div class="subscreen-frame">
+        <div class="subscreen-header">
+          <div class="subscreen-title-wrap">
+            <span class="subscreen-p5-badge" id="subscreen-p5-badge">ITEM</span>
+            <h1 class="subscreen-main-title" id="subscreen-main-title">PROJETOS & CASES</h1>
+          </div>
+          <button type="button" class="p5-back-btn" id="subscreen-close-btn">
+            <span class="back-key">ESC</span>
+            <span class="back-label">VOLTAR AO MENU</span>
+          </button>
+        </div>
+
+        <div class="subscreen-body" id="subscreen-body"></div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Supabase SDK + Cliente de Nuvem (Auth + Banco de Dados para GitHub Pages) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/data.js?v=9"></script>
+  <script src="js/audio.js?v=9"></script>
+  <script src="js/character-art.js?v=9"></script>
+  <script src="js/supabase-client.js?v=9"></script>
+  <script src="js/editor.js?v=9"></script>
+  <script src="js/app.js?v=9"></script>
+</body>
+</html>

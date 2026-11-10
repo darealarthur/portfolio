@@ -1,0 +1,847 @@
+/* ============================================================================
+   PERSONA 5 PORTFOLIO - SUB-TELAS INTERATIVAS (ITEM, EQUIP, PERSONA, STATS, BOND, REQUEST, SYSTEM)
+   ============================================================================ */
+
+.p5-subscreen-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 3vh 4vw;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.p5-subscreen-overlay.is-open {
+  pointer-events: auto;
+  opacity: 1;
+}
+
+.subscreen-backdrop {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    112deg,
+    rgba(8, 8, 8, 0.94) 0%,
+    rgba(18, 0, 4, 0.9) 62%,
+    rgba(255, 32, 30, 0.22) 100%
+  );
+  backdrop-filter: blur(4px);
+}
+
+/* Moldura principal da Sub-tela posicionada à esquerda/centro para deixar o Joker visível na direita! */
+.subscreen-frame {
+  position: relative;
+  z-index: 2;
+  width: min(1080px, 74vw);
+  height: min(86vh, 840px);
+  display: flex;
+  flex-direction: column;
+  transform: translateX(-60px) skewX(-2deg);
+  transition: transform 0.35s cubic-bezier(0.22, 1.35, 0.36, 1);
+}
+
+.p5-subscreen-overlay.is-open .subscreen-frame {
+  transform: translateX(0) skewX(0deg);
+}
+
+/* Cabeçalho angular da Sub-tela */
+.subscreen-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+  padding-bottom: 10px;
+  border-bottom: 5px solid #ffffff;
+  position: relative;
+}
+
+.subscreen-header::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -11px;
+  width: 38%;
+  height: 6px;
+  background: var(--p5-red);
+  transform: skewX(-25deg);
+}
+
+.subscreen-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.subscreen-p5-badge {
+  background: var(--p5-red);
+  color: #ffffff;
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  padding: 4px 16px;
+  border: 3px solid #ffffff;
+  transform: rotate(-4deg) skewX(-10deg);
+  box-shadow: -6px 6px 0 #000000;
+  letter-spacing: 1px;
+}
+
+.subscreen-main-title {
+  font-family: var(--font-display);
+  font-size: clamp(1.8rem, 3.2vw, 2.85rem);
+  color: #ffffff;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  text-shadow: -4px 4px 0 #000000, -7px 7px 0 var(--p5-red);
+}
+
+.p5-back-btn {
+  background: #000000;
+  color: #ffffff;
+  border: 3px solid #ffffff;
+  padding: 8px 18px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  transform: skewX(-14deg);
+  box-shadow: -6px 6px 0 var(--p5-red);
+  transition: transform 0.16s ease, background 0.16s ease, color 0.16s ease;
+}
+
+.p5-back-btn:hover {
+  background: #ffffff;
+  color: #000000;
+  transform: skewX(-14deg) scale(1.06);
+}
+
+.back-key {
+  background: var(--p5-red);
+  color: #ffffff;
+  font-family: var(--font-display);
+  padding: 2px 8px;
+  font-size: 0.9rem;
+}
+
+.back-label {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  letter-spacing: 1px;
+}
+
+/* Corpo rolável da Sub-tela */
+.subscreen-body {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 10px;
+}
+
+.subscreen-body::-webkit-scrollbar {
+  width: 8px;
+}
+.subscreen-body::-webkit-scrollbar-track {
+  background: #111;
+}
+.subscreen-body::-webkit-scrollbar-thumb {
+  background: var(--p5-red);
+  border: 2px solid #fff;
+}
+
+/* ============================================================================
+   SEÇÃO 1: ITEM (LISTA DE PROJETOS + CARD DE DETALHES ESTILO INVENTÁRIO P5)
+   ============================================================================ */
+.p5-item-layout {
+  display: grid;
+  grid-template-columns: 1fr 1.15fr;
+  gap: 24px;
+  height: 100%;
+  align-items: start;
+}
+
+.p5-item-list {
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+}
+
+.p5-project-row {
+  position: relative;
+  background: #0d0d0d;
+  border: 3px solid #ffffff;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  transform: skewX(-8deg);
+  box-shadow: -6px 6px 0 #000000;
+  transition: all 0.18s cubic-bezier(0.22, 1.4, 0.36, 1);
+}
+
+.p5-project-row:hover,
+.p5-project-row.is-active {
+  background: #ffffff;
+  color: #000000;
+  border-color: #000000;
+  transform: skewX(-8deg) translateX(12px) scale(1.02);
+  box-shadow: -10px 8px 0 var(--p5-red);
+}
+
+.proj-row-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.proj-rarity {
+  font-family: var(--font-display);
+  font-size: 0.82rem;
+  background: var(--p5-red);
+  color: #ffffff;
+  padding: 2px 7px;
+  transform: rotate(-5deg);
+}
+
+.proj-title {
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  letter-spacing: 0.6px;
+}
+
+.proj-new-badge {
+  background: var(--p5-yellow);
+  color: #000000;
+  font-family: var(--font-display);
+  font-size: 0.72rem;
+  padding: 1px 6px;
+  border: 2px solid #000;
+  transform: rotate(6deg);
+}
+
+.proj-cat-tag {
+  font-weight: 800;
+  font-size: 0.78rem;
+  opacity: 0.85;
+}
+
+/* Painel direito de inspeção do projeto */
+.p5-project-detail {
+  background: #090909;
+  border: 4px solid #ffffff;
+  padding: 24px;
+  position: relative;
+  transform: rotate(1deg);
+  box-shadow: -12px 12px 0 var(--p5-red), -16px 16px 0 #000000;
+}
+
+.detail-header-banner {
+  background: var(--p5-red);
+  color: #ffffff;
+  padding: 10px 16px;
+  margin: -24px -24px 18px -24px;
+  border-bottom: 4px solid #ffffff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.detail-header-banner h2 {
+  font-family: var(--font-display);
+  font-size: 1.75rem;
+  letter-spacing: 1px;
+  text-shadow: -3px 3px 0 #000;
+}
+
+.detail-summary {
+  font-size: 1.02rem;
+  line-height: 1.55;
+  color: #f0f0f0;
+  margin-bottom: 16px;
+}
+
+.detail-impact-box {
+  background: #171717;
+  border-left: 5px solid var(--p5-yellow);
+  padding: 10px 14px;
+  font-weight: 700;
+  color: var(--p5-yellow);
+  margin-bottom: 18px;
+  font-size: 0.92rem;
+}
+
+.detail-tech-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 22px;
+}
+
+.tech-chip {
+  background: #ffffff;
+  color: #000000;
+  font-family: var(--font-display);
+  font-size: 0.86rem;
+  padding: 4px 11px;
+  transform: skewX(-10deg);
+  box-shadow: -3px 3px 0 var(--p5-red);
+}
+
+.detail-actions {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.p5-action-btn {
+  text-decoration: none;
+  background: var(--p5-red);
+  color: #ffffff;
+  font-family: var(--font-display);
+  font-size: 1.08rem;
+  letter-spacing: 1px;
+  padding: 10px 22px;
+  border: 3px solid #ffffff;
+  transform: skewX(-12deg);
+  box-shadow: -5px 5px 0 #000000;
+  cursor: pointer;
+  transition: all 0.16s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.p5-action-btn:hover {
+  background: var(--p5-yellow);
+  color: #000000;
+  border-color: #000000;
+  transform: skewX(-12deg) translateY(-3px);
+}
+
+.p5-action-btn.secondary {
+  background: #000000;
+  color: #ffffff;
+}
+
+.p5-action-btn.secondary:hover {
+  background: #ffffff;
+  color: #000000;
+}
+
+/* ============================================================================
+   SEÇÃO 2: EQUIP (SLOTS DE EQUIPAMENTO / STACK DE TECNOLOGIAS)
+   ============================================================================ */
+.p5-equip-layout {
+  display: grid;
+  grid-template-columns: 1fr 1.15fr;
+  gap: 22px;
+}
+
+.equip-slot-card {
+  background: #0d0d0d;
+  border: 3px solid #ffffff;
+  padding: 14px 16px;
+  margin-bottom: 12px;
+  cursor: pointer;
+  transform: skewX(-7deg);
+  box-shadow: -6px 6px 0 #000;
+  transition: all 0.18s ease;
+}
+
+.equip-slot-card:hover,
+.equip-slot-card.is-active {
+  background: #ffffff;
+  color: #000000;
+  transform: skewX(-7deg) translateX(10px);
+  box-shadow: -9px 7px 0 var(--p5-red);
+}
+
+.slot-type-label {
+  font-size: 0.74rem;
+  font-weight: 800;
+  color: var(--p5-red);
+  letter-spacing: 1px;
+}
+
+.equip-slot-card.is-active .slot-type-label,
+.equip-slot-card:hover .slot-type-label {
+  color: #b8000f;
+}
+
+.slot-equipped-name {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  margin: 3px 0 6px 0;
+}
+
+.slot-stats-row {
+  display: flex;
+  gap: 16px;
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+}
+
+.equip-items-panel {
+  background: #0b0b0b;
+  border: 4px solid #ffffff;
+  padding: 20px;
+  box-shadow: -10px 10px 0 var(--p5-red);
+}
+
+.skill-bar-row {
+  margin-bottom: 14px;
+}
+
+.skill-bar-top {
+  display: flex;
+  justify-content: space-between;
+  font-weight: 800;
+  font-size: 0.92rem;
+  margin-bottom: 5px;
+}
+
+.skill-bar-track {
+  height: 14px;
+  background: #222;
+  border: 2px solid #fff;
+  transform: skewX(-16deg);
+  overflow: hidden;
+}
+
+.skill-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--p5-red), var(--p5-yellow));
+  transition: width 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ============================================================================
+   SEÇÃO 3: PERSONA (BIO, STATUS DE BATALHA, SKILLS & TIMELINE)
+   ============================================================================ */
+.p5-persona-layout {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 22px;
+}
+
+.persona-bio-card,
+.persona-skills-card {
+  background: #0b0b0b;
+  border: 3px solid #ffffff;
+  padding: 20px;
+  box-shadow: -8px 8px 0 var(--p5-red);
+}
+
+.persona-header-badge {
+  display: inline-block;
+  background: var(--p5-yellow);
+  color: #000000;
+  font-family: var(--font-display);
+  padding: 2px 10px;
+  font-size: 0.9rem;
+  transform: skewX(-10deg);
+  margin-bottom: 8px;
+}
+
+.persona-skill-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.persona-skill-item {
+  background: #161616;
+  border: 2px solid #ffffff;
+  padding: 10px;
+  transform: skewX(-5deg);
+}
+
+.persona-skill-item strong {
+  display: block;
+  font-family: var(--font-display);
+  color: var(--p5-yellow);
+  font-size: 1rem;
+}
+
+.timeline-item {
+  border-left: 4px solid var(--p5-red);
+  padding-left: 14px;
+  margin-top: 14px;
+}
+
+.timeline-period {
+  font-family: var(--font-display);
+  color: var(--p5-yellow);
+  font-size: 0.85rem;
+}
+
+/* ============================================================================
+   SEÇÃO 4: STATS (ESTRELA PENTÁGONO DE 5 PONTAS DO PERSONA 5!)
+   ============================================================================ */
+.p5-stats-layout {
+  display: grid;
+  grid-template-columns: 1.05fr 1fr;
+  gap: 24px;
+  align-items: center;
+}
+
+.stats-star-box {
+  background: #080808;
+  border: 3px solid #ffffff;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-shadow: -10px 10px 0 var(--p5-red);
+}
+
+.social-stat-card {
+  background: #0e0e0e;
+  border: 2px solid #ffffff;
+  padding: 11px 15px;
+  margin-bottom: 10px;
+  transform: skewX(-6deg);
+  box-shadow: -5px 5px 0 var(--p5-red);
+}
+
+.social-stat-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.social-stat-name {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  color: var(--p5-yellow);
+}
+
+.social-stat-rank {
+  background: var(--p5-red);
+  color: #fff;
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  padding: 2px 8px;
+}
+
+/* ============================================================================
+   SEÇÃO 5: BOND (CARTAS DE TAROT CONFIDANTS / LINKS SOCIAIS)
+   ============================================================================ */
+.p5-bond-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 18px;
+}
+
+.tarot-card {
+  background: #0a0a0a;
+  border: 3px solid #ffffff;
+  padding: 18px 14px;
+  text-decoration: none;
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 235px;
+  position: relative;
+  transform: rotate(-1.5deg);
+  box-shadow: -8px 8px 0 var(--p5-red);
+  transition: transform 0.2s cubic-bezier(0.22, 1.4, 0.36, 1), background 0.2s ease;
+}
+
+.tarot-card:hover {
+  background: #ffffff;
+  color: #000000;
+  transform: rotate(1.5deg) translateY(-8px) scale(1.03);
+  box-shadow: -12px 12px 0 var(--p5-yellow);
+}
+
+.tarot-roman {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  color: var(--p5-red);
+  border-bottom: 2px solid currentColor;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.tarot-title {
+  font-family: var(--font-display);
+  font-size: 1.55rem;
+  margin: 12px 0 4px 0;
+}
+
+.tarot-stars {
+  color: var(--p5-yellow);
+  font-size: 0.95rem;
+  letter-spacing: 1px;
+  text-shadow: -1px 1px 0 #000;
+}
+
+/* ============================================================================
+   SEÇÃO 6: REQUEST (CALLING CARD / FORMULÁRIO DE CONTATO)
+   ============================================================================ */
+.p5-request-layout {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 24px;
+}
+
+.calling-card-form {
+  background: #0b0b0b;
+  border: 3px solid #ffffff;
+  padding: 22px;
+  box-shadow: -9px 9px 0 var(--p5-red);
+}
+
+.p5-field {
+  margin-bottom: 14px;
+}
+
+.p5-field label {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  margin-bottom: 5px;
+  color: var(--p5-yellow);
+  letter-spacing: 0.8px;
+}
+
+.p5-input,
+.p5-textarea {
+  width: 100%;
+  background: #161616;
+  border: 2px solid #ffffff;
+  color: #ffffff;
+  padding: 10px 12px;
+  font-family: var(--font-ui);
+  font-size: 0.95rem;
+  font-weight: 600;
+  user-select: text;
+}
+
+.p5-input:focus,
+.p5-textarea:focus {
+  outline: none;
+  border-color: var(--p5-yellow);
+  background: #000000;
+  box-shadow: -4px 4px 0 var(--p5-red);
+}
+
+.calling-card-preview {
+  background: var(--p5-red);
+  border: 5px solid #000000;
+  outline: 3px solid #ffffff;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  transform: rotate(2deg);
+  box-shadow: -12px 12px 0 #000000;
+  position: relative;
+  overflow: hidden;
+}
+
+.calling-card-preview::before {
+  content: "";
+  position: absolute;
+  inset: 10px;
+  border: 3px dashed #000000;
+  pointer-events: none;
+}
+
+.ransom-title {
+  font-family: var(--font-display);
+  font-size: 2.1rem;
+  background: #000000;
+  color: #ffffff;
+  padding: 4px 16px;
+  transform: rotate(-3deg);
+  margin-bottom: 14px;
+  border: 2px solid #ffffff;
+}
+
+/* ============================================================================
+   SEÇÃO 7: SYSTEM (PAINEL EDITOR COMPLETO EM ABAS + EXPORTADOR DE DATA.JS)
+   ============================================================================ */
+.p5-editor-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.p5-editor-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  background: #0a0a0a;
+  border: 3px solid #ffffff;
+  padding: 12px 16px;
+  box-shadow: -6px 6px 0 var(--p5-red);
+}
+
+.p5-editor-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.p5-editor-tab {
+  background: #141414;
+  color: #ffffff;
+  border: 2px solid #ffffff;
+  padding: 7px 14px;
+  font-family: var(--font-display);
+  font-size: 0.92rem;
+  letter-spacing: 0.8px;
+  cursor: pointer;
+  transform: skewX(-10deg);
+  transition: all 0.15s ease;
+}
+
+.p5-editor-tab:hover {
+  background: #ffffff;
+  color: #000000;
+}
+
+.p5-editor-tab.is-active {
+  background: var(--p5-red);
+  color: #ffffff;
+  border-color: var(--p5-yellow);
+  box-shadow: -4px 4px 0 #000000;
+  transform: skewX(-10deg) translateY(-2px);
+}
+
+.p5-System-grid,
+.p5-system-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+
+.p5-form-row-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.p5-form-row-3 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 12px;
+}
+
+.system-box {
+  background: #0b0b0b;
+  border: 3px solid #ffffff;
+  padding: 18px;
+  box-shadow: -8px 8px 0 var(--p5-red);
+}
+
+.system-box h3 {
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  color: var(--p5-yellow);
+  margin-bottom: 12px;
+  letter-spacing: 0.8px;
+}
+
+.editor-item-card {
+  background: #111111;
+  border: 2px solid #ffffff;
+  padding: 16px;
+  margin-bottom: 16px;
+  position: relative;
+  box-shadow: -6px 6px 0 var(--p5-red);
+}
+
+.editor-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px solid #333;
+  padding-bottom: 8px;
+  margin-bottom: 12px;
+}
+
+.editor-item-title {
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  color: var(--p5-yellow);
+  letter-spacing: 0.8px;
+}
+
+.editor-mini-btn {
+  background: #222;
+  color: #fff;
+  border: 2px solid #fff;
+  padding: 4px 10px;
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  cursor: pointer;
+  transform: skewX(-8deg);
+  transition: all 0.14s ease;
+}
+
+.editor-mini-btn:hover {
+  background: var(--p5-yellow);
+  color: #000;
+  border-color: #000;
+}
+
+.editor-mini-btn.danger {
+  background: #5a0008;
+  border-color: #ff4d4d;
+}
+
+.editor-mini-btn.danger:hover {
+  background: #ff0018;
+  color: #fff;
+}
+
+.color-preset-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-top: 6px;
+}
+
+.color-swatch-btn {
+  width: 34px;
+  height: 34px;
+  border: 2px solid #ffffff;
+  cursor: pointer;
+  transform: skewX(-10deg);
+  transition: transform 0.15s ease;
+}
+
+.color-swatch-btn:hover {
+  transform: skewX(-10deg) scale(1.15);
+}
+
+@media (max-width: 960px) {
+  .subscreen-frame {
+    width: 92vw;
+  }
+  .p5-item-layout,
+  .p5-equip-layout,
+  .p5-persona-layout,
+  .p5-stats-layout,
+  .p5-request-layout,
+  .p5-system-grid,
+  .p5-form-row-2,
+  .p5-form-row-3 {
+    grid-template-columns: 1fr;
+  }
+}

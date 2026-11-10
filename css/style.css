@@ -1,0 +1,459 @@
+/* ============================================================================
+   PERSONA 5 PORTFOLIO - ESTILOS GERAIS, PALCO 1920x1080, PERSONAGEM & TRANSIÇÕES
+   ============================================================================ */
+
+:root {
+  --p5-red: #ff2220;
+  --p5-crimson: #d90012;
+  --p5-black: #050505;
+  --p5-charcoal: #1b191a;
+  --p5-white: #ffffff;
+  --p5-yellow: #f4ff00;
+  --p5-green: #2aff00;
+  --p5-blue: #2414ff;
+  --p5-magenta: #ff14a8;
+  --p5-cyan: #00f0ff;
+
+  --font-display: "Anton", "Impact", "Arial Black", sans-serif;
+  --font-comic: "Bangers", "Impact", cursive;
+  --font-tall: "Bebas Neue", sans-serif;
+  --font-ui: "Chakra Petch", sans-serif;
+  --font-marker: "Permanent Marker", cursive;
+
+  --stage-scale: 1;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  user-select: none;
+}
+
+html,
+body {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background-color: #050505;
+  color: var(--p5-white);
+  font-family: var(--font-ui);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Container externo ocupando 100% da janela com extensão perfeita das cores de fundo */
+.p5-stage {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background: linear-gradient(90deg, #1b191a 0%, #1b191a 48%, #030303 48%, #030303 100%);
+}
+
+/* Palco Virtual 1920x1080 (Mantém proporção 16:9 exata sem distorcer nem cortar nada!) */
+.p5-virtual-stage {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 1920px;
+  height: 1080px;
+  transform: translate(-50%, -50%) scale(var(--stage-scale, 1));
+  transform-origin: center center;
+  overflow: visible;
+}
+
+/* ============================================================================
+   CAMADA 1: BACKGROUND 1920x1080 & QUADRADOS FLUTUANTES
+   ============================================================================ */
+.p5-bg-wrapper {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1920px;
+  height: 1080px;
+  z-index: 1;
+  pointer-events: none;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.p5-bg-svg {
+  width: 1920px;
+  height: 1080px;
+  display: block;
+  overflow: visible;
+}
+
+#p5-red-slash-poly {
+  transition: transform 0.38s cubic-bezier(0.22, 1, 0.36, 1);
+  transform-origin: 960px 540px;
+}
+
+/* Quadrados cinza-escuros no lado direito igual à screenshot de P5 Strikers */
+.p5-pixel-grid {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 460px;
+  height: 820px;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.p5-bg-square {
+  position: absolute;
+  background: #222222;
+  animation: p5SquarePulse 3.4s ease-in-out infinite alternate;
+}
+
+@keyframes p5SquarePulse {
+  0% {
+    opacity: 0.45;
+    transform: scale(0.95);
+  }
+  100% {
+    opacity: 0.92;
+    transform: scale(1.04);
+  }
+}
+
+/* ============================================================================
+   CAMADA 2: PERSONAGEM (JOKER CUTOUT 1920x1080 + FANTASMAS + ¥14,128)
+   ============================================================================ */
+.p5-character-container {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1920px;
+  height: 1080px;
+  z-index: 4;
+  pointer-events: none;
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.p5-character-pose-wrap {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1920px;
+  height: 1080px;
+  transition: transform 0.32s cubic-bezier(0.2, 1.3, 0.4, 1);
+}
+
+.p5-char-img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1920px;
+  height: 1080px;
+  object-fit: contain;
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+
+/* Quando o usuário envia uma foto própria */
+.p5-char-img.is-custom-photo {
+  width: 980px;
+  height: 1040px;
+  left: 920px;
+  top: 40px;
+  object-fit: contain;
+  object-position: bottom center;
+  filter: drop-shadow(-16px 8px 0px #ff2220) drop-shadow(8px 8px 0px #000000);
+}
+
+.p5-char-main {
+  z-index: 3;
+}
+
+/* Badge ¥14,128 posicionada em pixels exatos no palco 1920x1080 (x=1504px, y=791px) */
+.p5-yen-badge {
+  position: absolute;
+  left: 1500px;
+  top: 785px;
+  z-index: 6;
+  pointer-events: auto;
+  cursor: pointer;
+  transform: rotate(13deg);
+  transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.p5-yen-badge:hover {
+  transform: rotate(9deg) scale(1.12);
+}
+
+.p5-yen-badge:active {
+  transform: rotate(15deg) scale(0.95);
+}
+
+.p5-yen-text {
+  display: inline-block;
+  font-family: var(--font-display);
+  font-size: 62px;
+  line-height: 1;
+  letter-spacing: 1px;
+  color: var(--p5-white);
+  background: #000000;
+  padding: 4px 18px 8px 16px;
+  clip-path: polygon(4% 8%, 98% 0%, 95% 94%, 0% 100%);
+  text-shadow:
+    -4px -4px 0 #000,
+     4px -4px 0 #000,
+    -4px  4px 0 #000,
+     5px  5px 0 #000;
+}
+
+/* Copyright / Assinatura no canto inferior direito igual à imagem */
+.p5-copyright-tag {
+  position: absolute;
+  right: 48px;
+  bottom: 24px;
+  z-index: 6;
+  font-family: Arial, Helvetica, sans-serif;
+  font-weight: 700;
+  font-size: 16px;
+  letter-spacing: 0.5px;
+  color: #e6e6e6;
+  text-shadow:
+    -2px -2px 0 #000,
+     2px -2px 0 #000,
+    -2px  2px 0 #000,
+     2px  2px 0 #000;
+  opacity: 0.92;
+}
+
+/* ============================================================================
+   CAMADA 4: BARRA SUPERIOR DE CONTROLES (HUD) & DICAS DE TECLADO
+   ============================================================================ */
+.p5-hud-topbar {
+  position: fixed;
+  top: 14px;
+  right: 18px;
+  z-index: 35;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.p5-hud-topbar.is-hidden-hud {
+  opacity: 0.08;
+}
+
+.p5-hud-topbar.is-hidden-hud:hover {
+  opacity: 1;
+}
+
+.p5-hud-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #000000;
+  border: 2px solid #ffffff;
+  padding: 5px 13px;
+  transform: skewX(-12deg);
+  cursor: pointer;
+  box-shadow: -4px 4px 0 var(--p5-red);
+  transition: transform 0.16s ease, box-shadow 0.16s ease;
+}
+
+.p5-hud-pill:hover {
+  transform: skewX(-12deg) translateY(-2px) scale(1.04);
+  box-shadow: -6px 6px 0 var(--p5-yellow);
+}
+
+.hud-tag {
+  font-size: 0.68rem;
+  background: var(--p5-red);
+  color: #fff;
+  padding: 1px 5px;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+}
+
+.p5-hud-pill strong {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  letter-spacing: 1px;
+  color: #ffffff;
+}
+
+.hud-lvl {
+  font-size: 0.8rem;
+  color: var(--p5-yellow);
+  font-weight: 800;
+}
+
+.p5-hud-btn {
+  background: #0c0c0c;
+  color: #ffffff;
+  border: 2px solid #ffffff;
+  padding: 6px 12px;
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: 0.76rem;
+  letter-spacing: 0.8px;
+  cursor: pointer;
+  transform: skewX(-12deg);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: -3px 3px 0 #000000;
+  transition: all 0.15s ease;
+}
+
+.p5-hud-btn:hover {
+  background: #ffffff;
+  color: #000000;
+  box-shadow: -4px 4px 0 var(--p5-red);
+  transform: skewX(-12deg) translateY(-2px);
+}
+
+.p5-hud-btn.is-active {
+  background: var(--p5-red);
+  color: #ffffff;
+  border-color: #ffffff;
+}
+
+.btn-dot {
+  width: 8px;
+  height: 8px;
+  background: var(--p5-green);
+  display: inline-block;
+  transform: rotate(45deg);
+}
+
+/* Dicas de navegação no canto inferior esquerdo */
+.p5-controls-hint {
+  position: fixed;
+  left: 18px;
+  bottom: 14px;
+  z-index: 35;
+  display: flex;
+  gap: 14px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.86);
+  background: rgba(0, 0, 0, 0.82);
+  padding: 6px 14px;
+  border-left: 4px solid var(--p5-red);
+  transform: skewX(-10deg);
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+
+.p5-controls-hint.is-hidden-hud {
+  opacity: 0;
+}
+
+.p5-controls-hint kbd {
+  background: #ffffff;
+  color: #000000;
+  padding: 1px 5px;
+  font-family: var(--font-display);
+  font-size: 0.74rem;
+  margin-right: 3px;
+}
+
+/* ============================================================================
+   CAMADA 5: TRANSIÇÃO DE CORTE DE TELA (SLASH WIPE)
+   ============================================================================ */
+.p5-slash-transition {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.slash-shard {
+  position: absolute;
+  inset: -25%;
+  transform: translateX(-140%) rotate(-18deg);
+  will-change: transform;
+}
+
+.shard-1 {
+  background: var(--p5-red);
+  clip-path: polygon(0 18%, 100% 0, 100% 52%, 0 38%);
+}
+
+.shard-2 {
+  background: #000000;
+  clip-path: polygon(0 36%, 100% 24%, 100% 78%, 0 68%);
+  border-top: 8px solid #ffffff;
+  border-bottom: 8px solid #ffffff;
+}
+
+.shard-3 {
+  background: #ffffff;
+  clip-path: polygon(0 65%, 100% 54%, 100% 92%, 0 84%);
+}
+
+.slash-star-burst {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  font-size: 16rem;
+  color: #ffffff;
+  text-shadow: -10px 10px 0 #000000, 10px -10px 0 var(--p5-red);
+  transform: translate(-50%, -50%) scale(0) rotate(-90deg);
+  opacity: 0;
+}
+
+.p5-slash-transition.is-animating .shard-1 {
+  animation: slashWipe1 0.52s cubic-bezier(0.7, 0, 0.2, 1) forwards;
+}
+
+.p5-slash-transition.is-animating .shard-2 {
+  animation: slashWipe2 0.56s cubic-bezier(0.7, 0, 0.2, 1) 0.04s forwards;
+}
+
+.p5-slash-transition.is-animating .shard-3 {
+  animation: slashWipe1 0.54s cubic-bezier(0.7, 0, 0.2, 1) 0.08s forwards;
+}
+
+.p5-slash-transition.is-animating .slash-star-burst {
+  animation: starBurstPop 0.52s cubic-bezier(0.22, 1, 0.36, 1) 0.05s forwards;
+}
+
+@keyframes slashWipe1 {
+  0% {
+    transform: translateX(-130%) rotate(-18deg);
+  }
+  45% {
+    transform: translateX(0%) rotate(-18deg);
+  }
+  100% {
+    transform: translateX(135%) rotate(-18deg);
+  }
+}
+
+@keyframes slashWipe2 {
+  0% {
+    transform: translateX(130%) rotate(-18deg);
+  }
+  45% {
+    transform: translateX(0%) rotate(-18deg);
+  }
+  100% {
+    transform: translateX(-135%) rotate(-18deg);
+  }
+}
+
+@keyframes starBurstPop {
+  0% {
+    transform: translate(-50%, -50%) scale(0) rotate(-120deg);
+    opacity: 0;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.35) rotate(15deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(2.4) rotate(90deg);
+    opacity: 0;
+  }
+}

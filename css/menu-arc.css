@@ -1,0 +1,294 @@
+/* ============================================================================
+   PERSONA 5 PORTFOLIO - MENU EM ARCO 3D (ESPAÇAMENTO LIMPO E ORDENADO)
+   ============================================================================ */
+
+.p5-menu-zone {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1920px;
+  height: 1080px;
+  z-index: 12;
+  pointer-events: none;
+}
+
+.p5-menu-list {
+  list-style: none;
+  position: relative;
+  width: 1920px;
+  height: 1080px;
+  margin: 0;
+  padding: 0;
+  pointer-events: none;
+}
+
+.p5-menu-item {
+  position: absolute;
+  pointer-events: none;
+  transform-origin: 45px 60px;
+  transition: transform 0.2s cubic-bezier(0.22, 1.4, 0.36, 1), filter 0.18s ease;
+  will-change: transform;
+  outline: none;
+}
+
+.p5-word-hitarea {
+  pointer-events: all;
+  cursor: pointer;
+}
+
+/* ============================================================================
+   ARCO HARMONIOSO E BEM ESPAÇADO (ZERO COLISÃO NAS PONTAS DIREITAS!)
+   ============================================================================ */
+.p5-menu-item[data-id="item"] {
+  left: 560px;
+  top: 46px;
+  transform: rotate(21deg) scale(1);
+  z-index: 18;
+}
+
+.p5-menu-item[data-id="equip"] {
+  left: 440px;
+  top: 176px;
+  transform: rotate(14deg) scale(1);
+  z-index: 17;
+}
+
+.p5-menu-item[data-id="persona"] {
+  left: 345px;
+  top: 312px;
+  transform: rotate(7deg) scale(1);
+  z-index: 16;
+}
+
+.p5-menu-item[data-id="stats"] {
+  left: 380px;
+  top: 452px;
+  transform: rotate(0deg) scale(1);
+  z-index: 15;
+}
+
+.p5-menu-item[data-id="bond"] {
+  left: 350px;
+  top: 592px;
+  transform: rotate(-7deg) scale(1);
+  z-index: 14;
+}
+
+.p5-menu-item[data-id="request"] {
+  left: 390px;
+  top: 734px;
+  transform: rotate(-14deg) scale(1);
+  z-index: 13;
+}
+
+.p5-menu-item[data-id="system"] {
+  left: 495px;
+  top: 874px;
+  transform: rotate(-21deg) scale(1);
+  z-index: 12;
+}
+
+/* Estado Selecionado: Destaque elástico limpo sem invadir o item vizinho */
+.p5-menu-item.is-selected {
+  z-index: 28 !important;
+  filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.85));
+}
+
+.p5-menu-item[data-id="item"].is-selected {
+  transform: rotate(21deg) scale(1.08) translate(10px, -3px);
+}
+.p5-menu-item[data-id="equip"].is-selected {
+  transform: rotate(14deg) scale(1.08) translate(10px, -3px);
+}
+.p5-menu-item[data-id="persona"].is-selected {
+  transform: rotate(7deg) scale(1.08) translate(10px, -3px);
+}
+.p5-menu-item[data-id="stats"].is-selected {
+  transform: rotate(0deg) scale(1.08) translate(10px, -3px);
+}
+.p5-menu-item[data-id="bond"].is-selected {
+  transform: rotate(-7deg) scale(1.08) translate(10px, -3px);
+}
+.p5-menu-item[data-id="request"].is-selected {
+  transform: rotate(-14deg) scale(1.08) translate(10px, -3px);
+}
+.p5-menu-item[data-id="system"].is-selected {
+  transform: rotate(-21deg) scale(1.08) translate(10px, -3px);
+}
+
+/* ============================================================================
+   TIPOGRAFIA 3D EM 3 CAMADAS SEPARADAS (LETRAS NÍTIDAS E SEM SOBREPOSIÇÃO)
+   ============================================================================ */
+.p5-word-svg {
+  display: block;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.p5-svg-letter-face,
+.p5-svg-extrude-back,
+.p5-svg-extrude-mid {
+  font-family: var(--font-display);
+  font-weight: 900;
+  text-transform: uppercase;
+  paint-order: stroke fill;
+}
+
+/* Camada 1 (Traseira): Sombra 3D preta profunda */
+.p5-svg-extrude-back {
+  fill: #000000;
+  stroke: #000000;
+  stroke-width: 14px;
+}
+
+/* Camada 2 (Meio): Extrusão 3D intermediária */
+.p5-svg-extrude-mid {
+  fill: #000000;
+  stroke: #000000;
+  stroke-width: 10px;
+  transition: fill 0.14s ease;
+}
+
+/* Camada 3 (Frente): Face branca nítida por cima de todas as sombras! */
+.p5-svg-letter-face {
+  fill: #ffffff;
+  stroke: #000000;
+  stroke-width: 7px;
+  transition: fill 0.14s ease, stroke 0.14s ease;
+}
+
+.p5-letter-inner-detail {
+  fill: #000000;
+  transition: fill 0.14s ease;
+}
+
+.sideblock-hatch-dark {
+  opacity: 1;
+}
+.sideblock-hatch-light {
+  opacity: 0;
+}
+
+/* Quando Selecionado: Extrusão intermediária branca, face preta com contorno branco nítido */
+.p5-menu-item.is-selected .p5-svg-extrude-mid {
+  fill: #ffffff;
+}
+
+.p5-menu-item.is-selected .p5-svg-letter-face {
+  fill: #000000;
+  stroke: #ffffff;
+  stroke-width: 5.5px;
+}
+
+.p5-menu-item.is-selected .p5-letter-inner-detail {
+  fill: #ffffff;
+}
+
+.p5-menu-item.is-selected .sideblock-hatch-dark {
+  opacity: 0;
+}
+.p5-menu-item.is-selected .sideblock-hatch-light {
+  opacity: 1;
+}
+
+/* Animação suave de pulso vertical nas letras do item ativo */
+.p5-menu-item.is-selected .p5-letter-anim {
+  animation: p5InnerLetterBounce 0.45s steps(2, end) infinite alternate;
+}
+
+@keyframes p5InnerLetterBounce {
+  0% {
+    transform: translateY(0px);
+  }
+  100% {
+    transform: translateY(-3px);
+  }
+}
+
+/* ============================================================================
+   CURSOR CROMÁTICO RGB/CMYK ATRÁS DA PALAVRA ATIVA
+   ============================================================================ */
+.p5-item-chromatic-bg {
+  opacity: 0;
+  transform: scale(0.8);
+  transform-origin: 150px 55px;
+  transition: opacity 0.15s ease, transform 0.22s cubic-bezier(0.22, 1.5, 0.36, 1);
+}
+
+.p5-menu-item.is-selected .p5-item-chromatic-bg {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.p5-menu-item.is-selected .c-blue {
+  animation: cGlitch1 0.42s steps(2, end) infinite alternate;
+}
+.p5-menu-item.is-selected .c-green {
+  animation: cGlitch2 0.36s steps(2, end) infinite alternate;
+}
+.p5-menu-item.is-selected .c-yellow {
+  animation: cGlitch3 0.48s steps(2, end) infinite alternate;
+}
+.p5-menu-item.is-selected .c-magenta {
+  animation: cGlitch1 0.39s steps(2, end) infinite alternate-reverse;
+}
+
+@keyframes cGlitch1 {
+  0% { transform: translate(0, 0); }
+  100% { transform: translate(-5px, 3px); }
+}
+@keyframes cGlitch2 {
+  0% { transform: translate(0, 0); }
+  100% { transform: translate(5px, -4px); }
+}
+@keyframes cGlitch3 {
+  0% { transform: translate(0, 0); }
+  100% { transform: translate(6px, 3px); }
+}
+
+/* ============================================================================
+   SUBTÍTULO + SETA VERDE/AMARELA NEON
+   ============================================================================ */
+.p5-sublabel-group {
+  opacity: 0;
+  transition: opacity 0.16s ease;
+}
+
+.p5-menu-item.is-selected .p5-sublabel-group {
+  opacity: 1;
+}
+
+.p5-svg-sublabel {
+  font-family: var(--font-ui);
+  font-weight: 800;
+  font-style: italic;
+  font-size: 25px;
+  fill: #ffffff;
+  stroke: #000000;
+  stroke-width: 7px;
+  paint-order: stroke fill;
+  letter-spacing: 0.5px;
+}
+
+/* ============================================================================
+   BADGE "9 pt" À ESQUERDA DE REDES
+   ============================================================================ */
+.p5-bond-badge {
+  position: absolute;
+  left: -172px;
+  top: 4px;
+  width: 180px;
+  height: 98px;
+  pointer-events: none;
+  animation: bondBadgeFloat 1.1s ease-in-out infinite alternate;
+  filter: drop-shadow(-6px 7px 0px #000000);
+}
+
+@keyframes bondBadgeFloat {
+  0% {
+    transform: translateX(0px) rotate(-3deg);
+  }
+  100% {
+    transform: translateX(-8px) rotate(2deg) scale(1.04);
+  }
+}
