@@ -25,7 +25,8 @@ class P5VisualEditor {
   }
 
   // Converte um arquivo de imagem (PNG, SVG, JPG, WEBP) em DataURL leve para salvar no Supabase!
-  processLogoFile(file, callback, maxDim = 128) {
+  // Se trimBottom=true (usado para o PNG de personagem), remove qualquer margem transparente na base para colar 100% na borda!
+  processLogoFile(file, callback, maxDim = 128, trimBottom = false) {
     if (!file) return;
     const reader = new FileReader();
     reader.onload = (ev) => {
@@ -44,6 +45,34 @@ class P5VisualEditor {
         const ctx = canvas.getContext("2d");
         ctx.clearRect(0, 0, w, h);
         ctx.drawImage(img, 0, 0, w, h);
+
+        if (trimBottom) {
+          const imgData = ctx.getImageData(0, 0, w, h).data;
+          let lastNonEmptyY = h - 1;
+          for (let y = h - 1; y >= 0; y--) {
+            let rowHasPixel = false;
+            for (let x = 0; x < w; x++) {
+              if (imgData[(y * w + x) * 4 + 3] > 15) {
+                rowHasPixel = true;
+                break;
+              }
+            }
+            if (rowHasPixel) {
+              lastNonEmptyY = y;
+              break;
+            }
+          }
+          if (lastNonEmptyY < h - 1 && lastNonEmptyY > 10) {
+            const trimmedH = lastNonEmptyY + 1;
+            const outCanvas = document.createElement("canvas");
+            outCanvas.width = w;
+            outCanvas.height = trimmedH;
+            outCanvas.getContext("2d").drawImage(canvas, 0, 0, w, trimmedH, 0, 0, w, trimmedH);
+            callback(outCanvas.toDataURL("image/png"));
+            return;
+          }
+        }
+
         callback(canvas.toDataURL("image/png"));
       };
       img.onerror = () => callback(ev.target.result);
@@ -1574,7 +1603,8 @@ window.PORTFOLIO_DATA = ${jsonString};
               this.saveAllToStorage(appCallbacks);
               this.render(containerEl, appCallbacks);
             },
-            720
+            720,
+            true
           );
         });
       }
