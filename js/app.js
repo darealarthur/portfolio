@@ -572,6 +572,16 @@
               `
               : ""
           }
+
+          ${
+            info.personaArtUrl
+              ? `
+                <div class="persona-char-art-wrap">
+                  <img src="${info.personaArtUrl}" alt="Persona Character Art" class="persona-char-art-img" />
+                </div>
+              `
+              : ""
+          }
         </div>
 
         <div class="persona-skills-card">

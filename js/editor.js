@@ -24,14 +24,13 @@ class P5VisualEditor {
     return `https://${u.replace(/^\/+/, "")}`;
   }
 
-  // Converte um arquivo de imagem (PNG, SVG, JPG, WEBP) em DataURL leve (máx 128x128) para salvar no Supabase!
-  processLogoFile(file, callback) {
+  // Converte um arquivo de imagem (PNG, SVG, JPG, WEBP) em DataURL leve para salvar no Supabase!
+  processLogoFile(file, callback, maxDim = 128) {
     if (!file) return;
     const reader = new FileReader();
     reader.onload = (ev) => {
       const img = new Image();
       img.onload = () => {
-        const maxDim = 128;
         let w = img.width || 64;
         let h = img.height || 64;
         if (w > maxDim || h > maxDim) {
@@ -741,6 +740,19 @@ window.PORTFOLIO_DATA = ${jsonString};
           </div>
         </div>
 
+        <div class="p5-field" style="margin-bottom:16px;">
+          <label>PNG DE PERSONAGEM NO CARD DA ESQUERDA (URL OU UPLOAD DO PC)</label>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+            ${info.personaArtUrl ? `<img src="${this.escapeAttr(info.personaArtUrl)}" alt="" style="width:48px;height:48px;object-fit:contain;background:#222;padding:3px;border:1px solid #fff;" />` : ""}
+            <input type="text" id="ed-persona-art" class="p5-input" value="${this.escapeAttr(info.personaArtUrl || "")}" placeholder="Cole o link do PNG ou envie do PC ->" style="flex:1;min-width:180px;" />
+            <label class="editor-mini-btn" style="cursor:pointer;margin:0;white-space:nowrap;">
+              📁 ENVIAR PNG DO PC
+              <input type="file" accept="image/*" id="ed-persona-art-file" hidden />
+            </label>
+            ${info.personaArtUrl ? `<button type="button" class="editor-mini-btn danger" id="btn-clear-persona-art" title="Remover imagem">✕ REMOVER</button>` : ""}
+          </div>
+        </div>
+
         ${info.stats
           .map(
             (st, i) => `
@@ -1106,8 +1118,10 @@ window.PORTFOLIO_DATA = ${jsonString};
       const info = D.personaInfo;
       const pnPt = containerEl.querySelector("#ed-pname-pt");
       const pnEn = containerEl.querySelector("#ed-pname-en");
+      const pArt = containerEl.querySelector("#ed-persona-art");
       if (pnPt) info.personaNamePt = pnPt.value.trim();
       if (pnEn) info.personaNameEn = pnEn.value.trim();
+      if (pArt) info.personaArtUrl = pArt.value.trim();
 
       containerEl.querySelectorAll(".ed-pstat-row").forEach((row) => {
         const idx = Number(row.dataset.statIdx);
@@ -1547,6 +1561,34 @@ window.PORTFOLIO_DATA = ${jsonString};
 
     // Eventos da Aba 5 (Persona & Carreira)
     if (this.activeTab === "persona") {
+      const pArtFile = containerEl.querySelector("#ed-persona-art-file");
+      if (pArtFile) {
+        pArtFile.addEventListener("change", (e) => {
+          const file = e.target.files && e.target.files[0];
+          if (!file) return;
+          this.collectCurrentTabValues(containerEl);
+          this.processLogoFile(
+            file,
+            (dataUrl) => {
+              D.personaInfo.personaArtUrl = dataUrl;
+              this.saveAllToStorage(appCallbacks);
+              this.render(containerEl, appCallbacks);
+            },
+            720
+          );
+        });
+      }
+
+      const clearPArtBtn = containerEl.querySelector("#btn-clear-persona-art");
+      if (clearPArtBtn) {
+        clearPArtBtn.addEventListener("click", () => {
+          this.collectCurrentTabValues(containerEl);
+          D.personaInfo.personaArtUrl = "";
+          this.saveAllToStorage(appCallbacks);
+          this.render(containerEl, appCallbacks);
+        });
+      }
+
       const addPstatBtn = containerEl.querySelector("#btn-add-pstat");
       if (addPstatBtn) {
         addPstatBtn.addEventListener("click", () => {

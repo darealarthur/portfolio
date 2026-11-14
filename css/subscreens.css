@@ -434,6 +434,30 @@
   box-shadow: -8px 8px 0 var(--p5-red);
 }
 
+.persona-bio-card {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+}
+
+.persona-char-art-wrap {
+  margin-top: auto;
+  padding-top: 12px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  min-height: 220px;
+}
+
+.persona-char-art-img {
+  max-width: 100%;
+  max-height: 360px;
+  object-fit: contain;
+  filter: drop-shadow(-10px 6px 0 var(--p5-red));
+  pointer-events: none;
+}
+
 .persona-header-badge {
   display: inline-block;
   background: var(--p5-yellow);
